@@ -12,14 +12,8 @@
             overflow-y: auto; /* Allow vertical scrolling if the PDF has multiple pages */
             margin: 0 auto;
             border: 1px solid #ddd;
-            position: relative;
+            position: relative; /* To position the download icon */
             background-color: #f4f4f4; /* Light background color for better contrast */
-        }
-
-        canvas {
-            display: block;
-            margin-bottom: 20px; /* Add some space between the pages */
-            max-width: 100%; /* Ensure canvas fits within the container */
         }
 
         /* Style for the download icon */
@@ -41,12 +35,7 @@
             font-size: 20px;
         }
     </style>
-
-    <!-- PDF.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-
-    <!-- Font Awesome for download icon -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.2.6/pdfobject.min.js"></script>
 </head>
 <body>
 
@@ -60,57 +49,18 @@
     <div class="pdf-container" id="pdf-viewer"></div>
 
     <script>
-        // Path to your PDF file
-        var url = 'JKC_LetterHead (1).pdf';
-
-        // The PDF.js viewer
-        var pdfContainer = document.getElementById('pdf-viewer');
-
-        // Fetch and render the PDF
-        pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-            var pdfDoc = pdfDoc_;
-
-            // Function to render a page with enhanced resolution
-            function renderPage(num) {
-                pdfDoc.getPage(num).then(function(page) {
-                    // Calculate the scale based on the container's width
-                    var containerWidth = pdfContainer.clientWidth;
-                    var scale = containerWidth / page.getViewport({ scale: 1 }).width;
-
-                    // Increase the scale factor to enhance resolution for HD displays
-                    var enhancedScale = Math.min(scale, 2.5); // Adjusted scale for HD displays
-
-                    var viewport = page.getViewport({ scale: enhancedScale });
-
-                    // Create a canvas with high pixel density
-                    var canvas = document.createElement('canvas');
-                    var context = canvas.getContext('2d');
-                    canvas.height = viewport.height * window.devicePixelRatio; // High DPI
-                    canvas.width = viewport.width * window.devicePixelRatio; // High DPI
-                    canvas.style.width = viewport.width + 'px'; // Correct width for display
-                    canvas.style.height = viewport.height + 'px'; // Correct height for display
-                    pdfContainer.appendChild(canvas);
-
-                    // Render the page on the canvas with enhanced resolution
-                    page.render({
-                        canvasContext: context,
-                        viewport: viewport
-                    }).promise.then(function() {
-                        // Optional: Add a smooth scroll effect for page transition
-                        canvas.style.transition = "transform 0.3s ease-in-out";
-                    });
-                });
+        var options = {
+            width: "100%",
+            height: "100vh",
+            pdfOpenParams: {
+                navpanes: 1,
+                toolbar: 0,
+                statusbar: 0,
+                pagemode: 'none'
             }
+        };
 
-            // Loop through all pages and render them
-            for (var pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-                renderPage(pageNum);
-            }
-
-        }).catch(function(error) {
-            console.log(error);
-            pdfContainer.innerHTML = '<p>Unable to load PDF. Please try again later.</p>';
-        });
+        PDFObject.embed("JKC_LetterHead (1).pdf", "#pdf-viewer", options);
     </script>
 
 </body>
