@@ -5,27 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Display PDF</title>
     <style>
-        /* Ensure responsive design for mobile devices */
+        /* Make the PDF container responsive */
         .pdf-container {
             width: 100%;
-            height: 100vh; /* Full screen height */
-            overflow-y: auto; /* Enable vertical scrolling if needed */
+            height: 100vh; /* Ensure it takes up the full height of the viewport */
+            overflow-y: auto; /* Allow vertical scrolling if the PDF has multiple pages */
             margin: 0 auto;
             border: 1px solid #ddd;
-            position: relative;
-            background-color: #f4f4f4;
+            position: relative; /* To position the download icon */
+            background-color: #f4f4f4; /* Light background color for better contrast */
         }
 
-        /* Responsive canvas that adjusts its size */
         canvas {
             display: block;
-            margin-bottom: 20px;
-            max-width: 100%; /* Ensure canvas width doesn't overflow */
+            margin-bottom: 20px; /* Add some space between the pages */
+            max-width: 100%; /* Ensure canvas fits within the container */
         }
 
-        /* Download button styling */
+        /* Style for the download icon */
         .download-btn {
-            position: fixed;
+            position: fixed; /* Keep the button fixed at the top right corner */
             top: 10px;
             right: 10px;
             background-color: #2cb5e5;
@@ -35,20 +34,11 @@
             font-size: 16px;
             cursor: pointer;
             border-radius: 5px;
-            z-index: 100;
+            z-index: 100; /* Ensure it stays on top */
         }
 
         .download-btn i {
             font-size: 20px;
-        }
-
-        /* Mobile friendly */
-        @media (max-width: 600px) {
-            .download-btn {
-                top: 5px;
-                right: 5px;
-                font-size: 14px;
-            }
         }
     </style>
 
@@ -83,12 +73,12 @@
             // Function to render a page with enhanced resolution
             function renderPage(num) {
                 pdfDoc.getPage(num).then(function(page) {
-                    // Calculate the scale based on the container's width
+                    // Calculate the scale based on the container's width and enhance for high DPI
                     var containerWidth = pdfContainer.clientWidth;
                     var scale = containerWidth / page.getViewport({ scale: 1 }).width;
 
-                    // Enhanced scale for better rendering on high DPI displays
-                    var enhancedScale = Math.min(scale, 50); // Adjusted scale for better quality
+                    // Increase the scale factor to enhance resolution for HD displays
+                    var enhancedScale = Math.min(scale, 2.5); // Adjusted scale for Android devices and high DPI screens (increased from 2)
 
                     var viewport = page.getViewport({ scale: enhancedScale });
                     var canvas = document.createElement('canvas');
@@ -102,7 +92,7 @@
                         canvasContext: context,
                         viewport: viewport
                     }).promise.then(function() {
-                        // Optional: Smooth transition for page rendering
+                        // Optional: Add a smooth scroll effect for page transition
                         canvas.style.transition = "transform 0.3s ease-in-out";
                     });
                 });
