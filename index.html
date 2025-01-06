@@ -12,7 +12,7 @@
             overflow-y: auto; /* Allow vertical scrolling if the PDF has multiple pages */
             margin: 0 auto;
             border: 1px solid #ddd;
-            position: relative; /* To position the download icon */
+            position: relative;
             background-color: #f4f4f4; /* Light background color for better contrast */
         }
 
@@ -73,18 +73,22 @@
             // Function to render a page with enhanced resolution
             function renderPage(num) {
                 pdfDoc.getPage(num).then(function(page) {
-                    // Calculate the scale based on the container's width and enhance for high DPI
+                    // Calculate the scale based on the container's width
                     var containerWidth = pdfContainer.clientWidth;
                     var scale = containerWidth / page.getViewport({ scale: 1 }).width;
 
                     // Increase the scale factor to enhance resolution for HD displays
-                    var enhancedScale = Math.min(scale, 2.5); // Adjusted scale for Android devices and high DPI screens (increased from 2)
+                    var enhancedScale = Math.min(scale, 2.5); // Adjusted scale for HD displays
 
                     var viewport = page.getViewport({ scale: enhancedScale });
+
+                    // Create a canvas with high pixel density
                     var canvas = document.createElement('canvas');
                     var context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
+                    canvas.height = viewport.height * window.devicePixelRatio; // High DPI
+                    canvas.width = viewport.width * window.devicePixelRatio; // High DPI
+                    canvas.style.width = viewport.width + 'px'; // Correct width for display
+                    canvas.style.height = viewport.height + 'px'; // Correct height for display
                     pdfContainer.appendChild(canvas);
 
                     // Render the page on the canvas with enhanced resolution
