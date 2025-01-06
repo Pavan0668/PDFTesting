@@ -88,7 +88,7 @@
                     var scale = containerWidth / page.getViewport({ scale: 1 }).width;
 
                     // Enhanced scale for better rendering on high DPI displays
-                    var enhancedScale = Math.min(scale, 5); // Adjusted scale for better quality
+                    var enhancedScale = Math.min(scale, 50); // Adjusted scale for better quality
 
                     var viewport = page.getViewport({ scale: enhancedScale });
                     var canvas = document.createElement('canvas');
