@@ -8,7 +8,7 @@
         /* Make the PDF container responsive */
         .pdf-container {
             width: 100%;
-            height: 80vh; /* Adjust height to make it more flexible */
+            height: 100vh; /* Ensure it takes up the full height of the viewport */
             overflow: hidden;
             margin: 0 auto;
             border: 1px solid #ddd;
@@ -37,7 +37,10 @@
             // Function to render a page
             function renderPage(num) {
                 pdfDoc.getPage(num).then(function(page) {
-                    var scale = 1.5;
+                    // Calculate the scale based on the container's width
+                    var containerWidth = pdfContainer.clientWidth;
+                    var scale = containerWidth / page.getViewport({ scale: 1 }).width;
+
                     var viewport = page.getViewport({ scale: scale });
                     var canvas = document.createElement('canvas');
                     var context = canvas.getContext('2d');
@@ -45,6 +48,7 @@
                     canvas.width = viewport.width;
                     pdfContainer.appendChild(canvas);
 
+                    // Render the page on the canvas
                     page.render({
                         canvasContext: context,
                         viewport: viewport
