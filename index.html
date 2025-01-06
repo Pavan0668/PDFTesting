@@ -11,18 +11,54 @@
             height: 80vh; /* Adjust height to make it more flexible */
             overflow: hidden;
             margin: 0 auto;
+            border: 1px solid #ddd;
         }
     </style>
+
+    <!-- PDF.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
 <body>
 
-    <div class="pdf-container">
-        <!-- Use iframe tag for better compatibility across browsers -->
-        <iframe src="JKC_LetterHead (1).pdf" width="100%" height="100%" frameborder="0">
-            <!-- Fallback content for browsers that don't support PDF rendering -->
-            <p>Your browser does not support viewing PDF files. You can <a href="path/to/your/pdf.pdf" download>download the PDF</a> instead.</p>
-        </iframe>
-    </div>
+    <div class="pdf-container" id="pdf-viewer"></div>
+
+    <script>
+        // Path to your PDF file
+        var url = 'JKC_LetterHead (1).pdf';
+
+        // The PDF.js viewer
+        var pdfContainer = document.getElementById('pdf-viewer');
+
+        // Fetch and render the PDF
+        pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+            var pdfDoc = pdfDoc_;
+            var pageNum = 1;
+
+            // Function to render a page
+            function renderPage(num) {
+                pdfDoc.getPage(num).then(function(page) {
+                    var scale = 1.5;
+                    var viewport = page.getViewport({ scale: scale });
+                    var canvas = document.createElement('canvas');
+                    var context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    pdfContainer.appendChild(canvas);
+
+                    page.render({
+                        canvasContext: context,
+                        viewport: viewport
+                    });
+                });
+            }
+
+            // Render the first page
+            renderPage(pageNum);
+        }).catch(function(error) {
+            console.log(error);
+            pdfContainer.innerHTML = '<p>Unable to load PDF. Please try again later.</p>';
+        });
+    </script>
 
 </body>
 </html>
