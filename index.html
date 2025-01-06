@@ -73,14 +73,13 @@
             // Function to render a page with enhanced resolution
             function renderPage(num) {
                 pdfDoc.getPage(num).then(function(page) {
-                    // Get the container width for responsive scaling
+                    // Calculate the scale based on the container's width and enhance for high DPI
                     var containerWidth = pdfContainer.clientWidth;
                     var scale = containerWidth / page.getViewport({ scale: 1 }).width;
 
-                    // Adjust scale based on device screen DPI for better resolution
-                    var enhancedScale = Math.min(scale, 2.5); // Scaling factor (adjust for better quality)
+                    // Use device pixel ratio to enhance resolution on high-DPI devices
+                    var enhancedScale = Math.min(scale * window.devicePixelRatio, 2.5); // Increase scale factor based on DPI for clarity
 
-                    // Get viewport with the enhanced resolution scale
                     var viewport = page.getViewport({ scale: enhancedScale });
                     var canvas = document.createElement('canvas');
                     var context = canvas.getContext('2d');
