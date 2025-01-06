@@ -9,22 +9,59 @@
         .pdf-container {
             width: 100%;
             height: 100vh; /* Ensure it takes up the full height of the viewport */
-            overflow: hidden;
+            overflow-y: auto; /* Allow vertical scrolling if the PDF has multiple pages */
             margin: 0 auto;
             border: 1px solid #ddd;
+            position: relative; /* To position the download icon */
+            background-color: #f4f4f4; /* Light background color for better contrast */
+        }
+
+        canvas {
+            display: block;
+            margin-bottom: 20px; /* Add some space between the pages */
+            max-width: 100%; /* Make sure the canvas doesn't overflow the container */
+        }
+
+        /* Style for the download icon */
+        .download-btn {
+            position: fixed; /* Keep the button fixed at the top right corner */
+            top: 10px;
+            right: 10px;
+            background-color: #2cb5e5;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 100; /* Ensure it stays on top */
+        }
+
+        .download-btn i {
+            font-size: 20px;
         }
     </style>
 
     <!-- PDF.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+
+    <!-- Font Awesome for download icon -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+
+    <!-- Download PDF Button -->
+    <a href="JKC_LetterHead (1).pdf" download>
+        <button class="download-btn">
+            <i class="fas fa-download"></i>
+        </button>
+    </a>
 
     <div class="pdf-container" id="pdf-viewer"></div>
 
     <script>
         // Path to your PDF file
-        var url = 'JKC_LetterHead (1).pdf';
+        var url = 'CA Vrushali Vasani Resume V2.pdf';
 
         // The PDF.js viewer
         var pdfContainer = document.getElementById('pdf-viewer');
@@ -32,32 +69,40 @@
         // Fetch and render the PDF
         pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
             var pdfDoc = pdfDoc_;
-            var pageNum = 1;
 
-            // Function to render a page
+            // Function to render a page with enhanced resolution
             function renderPage(num) {
                 pdfDoc.getPage(num).then(function(page) {
                     // Calculate the scale based on the container's width
                     var containerWidth = pdfContainer.clientWidth;
                     var scale = containerWidth / page.getViewport({ scale: 1 }).width;
 
-                    var viewport = page.getViewport({ scale: scale });
+                    // Increase the scale factor for higher quality rendering
+                    var enhancedScale = Math.min(scale, 5); // Adjusted scale for HD resolution (increased from 3 to 5)
+
+                    var viewport = page.getViewport({ scale: enhancedScale });
                     var canvas = document.createElement('canvas');
                     var context = canvas.getContext('2d');
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
                     pdfContainer.appendChild(canvas);
 
-                    // Render the page on the canvas
+                    // Render the page on the canvas with enhanced resolution
                     page.render({
                         canvasContext: context,
                         viewport: viewport
+                    }).promise.then(function() {
+                        // Optional: Add a smooth scroll effect for page transition
+                        canvas.style.transition = "transform 0.3s ease-in-out";
                     });
                 });
             }
 
-            // Render the first page
-            renderPage(pageNum);
+            // Loop through all pages and render them
+            for (var pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+                renderPage(pageNum);
+            }
+
         }).catch(function(error) {
             console.log(error);
             pdfContainer.innerHTML = '<p>Unable to load PDF. Please try again later.</p>';
